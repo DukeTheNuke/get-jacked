@@ -173,10 +173,10 @@ input[type="password"] { font: 500 16px var(--body); padding: 12px; border-radiu
 <div class="toast" id="toast" hidden></div>
 
 <script>
-// Parent code that unlocks the kettlebell phase. Change it to anything you like.
+// Dad's code that unlocks the kettlebell phase. Change it to anything you like.
 const PARENT_CODE = "2026";
 // Bump this every time the app is updated.
-const APP_VERSION = "1.4";
+const APP_VERSION = "1.5";
 const APP_DATE = "Nov 4, 2026";
 const KEY = "diamond-strength-v1";
 
@@ -204,7 +204,7 @@ const EX = {
   kbpress:   { why: "Overhead strength with your core braced in a half kneel, close to the position you're in when you throw.", sets: 3, reps: "8 each arm", rest: 60, levels: ["Half-kneeling KB press", "Half-kneeling KB press, 3 sec lower"], cue: "Down knee on the same side as the pressing arm. Squeeze that glute, ribs down, press straight up. Go light." },
   carry:     { why: "Your core fights being pulled sideways the whole time. Bonus: a grip that won't quit.", sets: 3, reps: "30 sec each hand", rest: 45, levels: ["Suitcase carry", "Suitcase carry, slower and taller"], cue: "Bell in one hand, walk tall without leaning. Your core keeps you straight." },
   kbstep:    { why: "Loaded single leg strength. One of the best carryovers to sprinting.", sets: 3, reps: "8 each leg", rest: 60, levels: ["Goblet step-up", "Goblet step-up, slow 3 sec lower"], cue: "Same rules as step-ups. Bell at your chest. Bench must be stable." },
-  swing:     { why: "Teaches an explosive hip snap. Same hip snap that drives a hard swing.", sets: 3, reps: "10", rest: 75, levels: ["Hip hinge drill (no swing yet)", "Two hand KB swing"], cue: "Learn this with a parent first. A swing is a hip snap, not a squat and not an arm lift." }
+  swing:     { why: "Teaches an explosive hip snap. Same hip snap that drives a hard swing.", sets: 3, reps: "10", rest: 75, levels: ["Hip hinge drill (no swing yet)", "Two hand KB swing"], cue: "Learn this with Dad first. A swing is a hip snap, not a squat and not an arm lift." }
 };
 
 /* Stick figure poses. Each pose: head, neck, elbow, wrist, far elbow, far wrist, hip, knee, ankle, far knee, far ankle, [kettlebell]. Floor is y 131. */
@@ -483,11 +483,11 @@ function programHTML() {
     ${p2open
       ? (S.phase !== 2 ? '<button type="button" class="btn primary" data-act="phase" data-p="2">Switch to Phase 2</button>' : "")
       : `<p class="warn">Dad unlocks this once he signs off on your squat, lunge, and push-up form. Earn it.</p>
-         <form class="row" id="unlockForm"><input type="password" id="unlockCode" inputmode="numeric" placeholder="Parent code" aria-label="Parent code"><button type="submit" class="btn">Unlock</button></form>
+         <form class="row" id="unlockForm"><input type="password" id="unlockCode" inputmode="numeric" placeholder="Dad's code" aria-label="Dad's code"><button type="submit" class="btn">Unlock</button></form>
          <p class="muted" id="unlockMsg" hidden>Wrong code. Nice try though.</p>`}
   </section>
   <section class="card">
-    <div class="ex-head"><div><p class="eyebrow">Phase 3</p><h2>Barbell Basics</h2></div><span class="badge lock">Parent present</span></div>
+    <div class="ex-head"><div><p class="eyebrow">Phase 3</p><h2>Barbell Basics</h2></div><span class="badge lock">Dad present</span></div>
     <p class="muted">Barbell squat, Romanian deadlift, and bench press, starting with an empty bar. Dad has to be in the room, and bench press always needs a spotter. Not built yet. This unlocks when you're ready for it.</p>
   </section>`;
 }
