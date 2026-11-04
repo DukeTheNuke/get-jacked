@@ -134,6 +134,7 @@ input[type="password"] { font: 500 16px var(--body); padding: 12px; border-radiu
 .log-top b { font-weight: 600; }
 .log-ex { font-size: 14px; color: var(--muted); display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; }
 .log-ex span:nth-child(even) { color: var(--ink); font-variant-numeric: tabular-nums; text-align: right; }
+.ver { text-align: center; font-size: 12px; color: var(--muted); letter-spacing: .04em; padding-block: 8px; font-variant-numeric: tabular-nums; }
 .daylist { display: flex; flex-direction: column; gap: 10px; }
 .timer { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--ink); color: var(--bg);
   padding: 12px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
@@ -157,6 +158,7 @@ input[type="password"] { font: 500 16px var(--body); padding: 12px; border-radiu
     <button type="button" data-view="rules">Rules</button>
   </nav>
   <main id="view"></main>
+  <footer class="ver" id="ver"></footer>
 </div>
 
 <div class="timer" id="timer" hidden>
@@ -173,6 +175,9 @@ input[type="password"] { font: 500 16px var(--body); padding: 12px; border-radiu
 <script>
 // Parent code that unlocks the kettlebell phase. Change it to anything you like.
 const PARENT_CODE = "2026";
+// Bump this every time the app is updated.
+const APP_VERSION = "1.4";
+const APP_DATE = "Nov 4, 2026";
 const KEY = "diamond-strength-v1";
 
 const EX = {
@@ -343,6 +348,7 @@ function readyToLevel(id) {
 }
 
 function render() {
+  $("ver").textContent = `Version ${APP_VERSION} · ${APP_DATE}`;
   $("phasePill").textContent = PHASES[S.phase].short;
   document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-current", String(b.dataset.view === view || (view === "workout" && b.dataset.view === "today"))));
   const v = $("view");
