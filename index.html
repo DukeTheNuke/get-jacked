@@ -12,7 +12,7 @@
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
 </head>
 <body>
-<title>Diamond Strength</title>
+<title>Duke's Diamond Strength</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -56,7 +56,7 @@ body {
 }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
 .app { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
-.top { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding-top: 20px; }
+.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 8px 12px; padding-top: 20px; }
 .brand { font-family: var(--display); font-weight: 700; font-size: 34px; line-height: 1; letter-spacing: .01em; text-transform: uppercase; margin: 0; }
 .brand span { color: var(--clay); }
 .pill { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; white-space: nowrap; }
@@ -90,6 +90,8 @@ ul.plain { margin: 0; padding-left: 20px; display: flex; flex-direction: column;
 .rx { font-family: var(--display); font-weight: 600; font-size: 20px; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .lvl { font-size: 13px; color: var(--muted); }
 .cue { font-size: 15px; color: var(--muted); }
+.why { font-size: 14px; color: var(--ink); background: var(--bg); border-radius: 8px; padding: 8px 10px; }
+.why b { color: var(--clay); font-weight: 600; }
 .badge { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 3px 8px; border-radius: 6px; white-space: nowrap; align-self: flex-start; }
 .badge.done { background: var(--grass-soft); color: var(--grass); }
 .badge.lock { background: var(--clay-soft); color: var(--clay); }
@@ -145,7 +147,7 @@ input[type="password"] { font: 500 16px var(--body); padding: 12px; border-radiu
 
 <div class="app">
   <header class="top">
-    <h1 class="brand">Diamond <span>Strength</span></h1>
+    <div><p class="eyebrow">Duke's</p><h1 class="brand">Diamond <span>Strength</span></h1></div>
     <span class="pill" id="phasePill"></span>
   </header>
   <nav class="tabs" aria-label="Sections">
@@ -174,30 +176,30 @@ const PARENT_CODE = "2026";
 const KEY = "diamond-strength-v1";
 
 const EX = {
-  squat:     { sets: 3, reps: "10-15", rest: 60, levels: ["Bodyweight squat", "Pause squat (3 sec at the bottom)", "Split squat", "Bulgarian split squat (back foot on bench)"], cue: "Chest up, knees track over toes, sit down like you're getting into a catcher's stance." },
-  revlunge:  { sets: 3, reps: "8 each leg", rest: 60, levels: ["Reverse lunge", "Reverse lunge, 2 sec pause at the bottom", "Reverse lunge with knee drive"], cue: "Step back, back knee lightly touches the floor, push up through the front heel." },
-  latlunge:  { sets: 2, reps: "6 each side", rest: 45, levels: ["Lateral lunge", "Lateral lunge with pause", "Cossack squat"], cue: "Like a big lead off step: sit into one hip, other leg straight, both feet flat." },
-  bridge:    { sets: 3, reps: "12", rest: 45, levels: ["Glute bridge", "Glute bridge, 3 sec squeeze at top", "Single leg glute bridge (12 each)"], cue: "Lie on your back, knees bent. Push through your heels, squeeze glutes at the top, keep ribs down." },
-  sideplank: { sets: 2, reps: "20-30 sec each side", rest: 30, levels: ["Side plank from knees", "Side plank", "Side plank with top leg raised"], cue: "Elbow right under your shoulder. Lift hips until you make a straight line from head to feet, then hold." },
-  deadbug:   { sets: 3, reps: "6 each side", rest: 30, levels: ["Dead bug", "Dead bug, 3 sec slow reach", "Dead bug, both legs low"], cue: "On your back, arms up, knees bent. Reach one arm back and the OPPOSITE leg out. Low back stays pressed into the floor." },
-  pushup:    { sets: 3, reps: "6-12", rest: 75, levels: ["Incline push-up (hands on bench)", "Push-up", "Push-up, 3 sec lower", "Push-up, feet on bench"], cue: "Body stays a straight plank, elbows about 45 degrees from your sides, chest close to the floor or bench." },
-  pike:      { sets: 3, reps: "5-8", rest: 60, levels: ["Pike push-up, small range", "Pike push-up", "Pike push-up, slow lower"], cue: "Hips high like an upside down V. Bend your elbows and lower the top of your head toward the floor in front of your hands." },
-  ytw:       { sets: 2, reps: "6 of each letter", rest: 45, levels: ["Prone Y-T-W raises", "Prone Y-T-W, 2 sec hold each"], cue: "Lie face down, thumbs up. Lift your arms off the floor into a Y, then a T, then a W. Light and controlled. This is arm care for throwing." },
-  plank:     { sets: 3, reps: "20-30 sec", rest: 30, levels: ["Plank", "Plank shoulder taps", "Plank shoulder taps, feet close together"], cue: "Squeeze glutes and stomach, hips stay level. No rocking side to side." },
-  hollow:    { sets: 3, reps: "15-25 sec", rest: 30, levels: ["Hollow hold, knees bent", "Hollow hold, legs straight", "Hollow rocks"], cue: "On your back, lift arms, shoulders and legs a few inches off the floor. Low back glued down. If it pops up, go back a level." },
-  stepup:    { sets: 3, reps: "8 each leg", rest: 60, levels: ["Step-up onto bench", "Step-up, slow 3 sec lower", "Step-up with knee drive"], cue: "Whole foot on the bench, drive through that heel. Don't push off the back foot. Make sure the bench can't tip." },
-  squatjump: { sets: 3, reps: "5", rest: 75, levels: ["Squat jump, stick the landing", "Squat jump", "Broad jump, stick the landing"], cue: "Swing arms, jump up, land soft and quiet with knees out. Rest fully. Every rep should be your best rep." },
-  skater:    { sets: 3, reps: "5 each side", rest: 60, levels: ["Skater step (no jump)", "Skater hop, hold landing 2 sec", "Continuous skater hops"], cue: "Push sideways like you're stealing second, land on one leg and hold it." },
-  bear:      { sets: 3, reps: "20 sec", rest: 45, levels: ["Bear hold (knees 1 inch off floor)", "Bear crawl forward and back", "Lateral bear crawl"], cue: "Hands under shoulders, knees under hips. Back flat like a table, knees just off the floor, move slow." },
-  twist:     { sets: 3, reps: "10 each side", rest: 45, levels: ["Russian twist, feet down", "Russian twist, feet up", "Russian twist, feet up, 2 sec each side"], cue: "Sit, lean back a little, hands together. Turn from your ribs, not just your arms. Same hip and shoulder separation you use when you swing." },
-  goblet:    { sets: 3, reps: "8-10", rest: 75, levels: ["Goblet squat", "Goblet squat, 3 sec pause", "Goblet split squat (8 each)"], cue: "Hold the bell at your chest by the horns, elbows inside knees at the bottom, chest up." },
-  kbrdl:     { sets: 3, reps: "8", rest: 75, levels: ["Kettlebell deadlift", "Kettlebell Romanian deadlift", "Single leg KB Romanian deadlift (6 each)"], cue: "Push hips back, flat back, bell stays close to your legs. Stand tall and squeeze glutes." },
-  kblunge:   { sets: 3, reps: "6 each leg", rest: 60, levels: ["Goblet reverse lunge", "Goblet reverse lunge, 2 sec pause"], cue: "Same as your reverse lunge, bell held at your chest. Stay tall." },
-  kbrow:     { sets: 3, reps: "10 each arm", rest: 60, levels: ["One arm KB row (hand and knee on bench)", "One arm KB row, 2 sec squeeze"], cue: "Flat back, pull the bell to your hip pocket, don't twist your body." },
-  kbpress:   { sets: 3, reps: "8 each arm", rest: 60, levels: ["Half-kneeling KB press", "Half-kneeling KB press, 3 sec lower"], cue: "Down knee on the same side as the pressing arm. Squeeze that glute, ribs down, press straight up. Go light." },
-  carry:     { sets: 3, reps: "30 sec each hand", rest: 45, levels: ["Suitcase carry", "Suitcase carry, slower and taller"], cue: "Bell in one hand, walk tall without leaning. Your core keeps you straight." },
-  kbstep:    { sets: 3, reps: "8 each leg", rest: 60, levels: ["Goblet step-up", "Goblet step-up, slow 3 sec lower"], cue: "Same rules as step-ups. Bell at your chest. Bench must be stable." },
-  swing:     { sets: 3, reps: "10", rest: 75, levels: ["Hip hinge drill (no swing yet)", "Two hand KB swing"], cue: "Learn this with a parent first. A swing is a hip snap, not a squat and not an arm lift." }
+  squat:     { why: "Your legs make the power. Every throw and swing starts at the ground and travels up through your hips.", sets: 3, reps: "10-15", rest: 60, levels: ["Bodyweight squat", "Pause squat (3 sec at the bottom)", "Split squat", "Bulgarian split squat (back foot on bench)"], cue: "Chest up, knees track over toes, sit down like you're getting into a catcher's stance." },
+  revlunge:  { why: "Baseball is played one leg at a time: pushing off the rubber, landing your stride, sprinting to first. Lunges train each leg on its own.", sets: 3, reps: "8 each leg", rest: 60, levels: ["Reverse lunge", "Reverse lunge, 2 sec pause at the bottom", "Reverse lunge with knee drive"], cue: "Step back, back knee lightly touches the floor, push up through the front heel." },
+  latlunge:  { why: "Fielding, leads, and stealing all move sideways, but most training only goes forward and back. This fills the gap.", sets: 2, reps: "6 each side", rest: 45, levels: ["Lateral lunge", "Lateral lunge with pause", "Cossack squat"], cue: "Like a big lead off step: sit into one hip, other leg straight, both feet flat." },
+  bridge:    { why: "Glutes are the engine for sprinting and rotating. Strong glutes also take stress off your lower back.", sets: 3, reps: "12", rest: 45, levels: ["Glute bridge", "Glute bridge, 3 sec squeeze at top", "Single leg glute bridge (12 each)"], cue: "Lie on your back, knees bent. Push through your heels, squeeze glutes at the top, keep ribs down." },
+  sideplank: { why: "Trains the side core muscles that keep your trunk from collapsing when you rotate hard.", sets: 2, reps: "20-30 sec each side", rest: 30, levels: ["Side plank from knees", "Side plank", "Side plank with top leg raised"], cue: "Elbow right under your shoulder. Lift hips until you make a straight line from head to feet, then hold." },
+  deadbug:   { why: "Teaches your core to stay locked while your arms and legs move. That's exactly what happens during a swing.", sets: 3, reps: "6 each side", rest: 30, levels: ["Dead bug", "Dead bug, 3 sec slow reach", "Dead bug, both legs low"], cue: "On your back, arms up, knees bent. Reach one arm back and the OPPOSITE leg out. Low back stays pressed into the floor." },
+  pushup:    { why: "Chest, shoulders, and triceps, plus your core has to hold a plank the whole time. Two exercises for the price of one.", sets: 3, reps: "6-12", rest: 75, levels: ["Incline push-up (hands on bench)", "Push-up", "Push-up, 3 sec lower", "Push-up, feet on bench"], cue: "Body stays a straight plank, elbows about 45 degrees from your sides, chest close to the floor or bench." },
+  pike:      { why: "Builds overhead shoulder strength, which helps keep a throwing arm durable.", sets: 3, reps: "5-8", rest: 60, levels: ["Pike push-up, small range", "Pike push-up", "Pike push-up, slow lower"], cue: "Hips high like an upside down V. Bend your elbows and lower the top of your head toward the floor in front of your hands." },
+  ytw:       { why: "Works the small back muscles that control your shoulder blade. Pitchers use versions of these for arm care.", sets: 2, reps: "6 of each letter", rest: 45, levels: ["Prone Y-T-W raises", "Prone Y-T-W, 2 sec hold each"], cue: "Lie face down, thumbs up. Lift your arms off the floor into a Y, then a T, then a W. Light and controlled. This is arm care for throwing." },
+  plank:     { why: "A stiff core passes force from your legs to your arms instead of leaking it. Think solid bat versus wet noodle.", sets: 3, reps: "20-30 sec", rest: 30, levels: ["Plank", "Plank shoulder taps", "Plank shoulder taps, feet close together"], cue: "Squeeze glutes and stomach, hips stay level. No rocking side to side." },
+  hollow:    { why: "Gymnasts build ridiculous core strength from this one position. It teaches your whole front side to brace.", sets: 3, reps: "15-25 sec", rest: 30, levels: ["Hollow hold, knees bent", "Hollow hold, legs straight", "Hollow rocks"], cue: "On your back, lift arms, shoulders and legs a few inches off the floor. Low back glued down. If it pops up, go back a level." },
+  stepup:    { why: "Single leg strength in a real world pattern, like driving off the mound.", sets: 3, reps: "8 each leg", rest: 60, levels: ["Step-up onto bench", "Step-up, slow 3 sec lower", "Step-up with knee drive"], cue: "Whole foot on the bench, drive through that heel. Don't push off the back foot. Make sure the bench can't tip." },
+  squatjump: { why: "Baseball rewards how FAST you make force, not just how much. Jumps train speed.", sets: 3, reps: "5", rest: 75, levels: ["Squat jump, stick the landing", "Squat jump", "Broad jump, stick the landing"], cue: "Swing arms, jump up, land soft and quiet with knees out. Rest fully. Every rep should be your best rep." },
+  skater:    { why: "Lateral power plus landing control. That's your first step to the backhand side.", sets: 3, reps: "5 each side", rest: 60, levels: ["Skater step (no jump)", "Skater hop, hold landing 2 sec", "Continuous skater hops"], cue: "Push sideways like you're stealing second, land on one leg and hold it." },
+  bear:      { why: "Shoulders, core, and coordination all at once. Way harder than it looks.", sets: 3, reps: "20 sec", rest: 45, levels: ["Bear hold (knees 1 inch off floor)", "Bear crawl forward and back", "Lateral bear crawl"], cue: "Hands under shoulders, knees under hips. Back flat like a table, knees just off the floor, move slow." },
+  twist:     { why: "Rotation is the whole game. This trains your ribs to turn separately from your hips, which is where bat speed comes from.", sets: 3, reps: "10 each side", rest: 45, levels: ["Russian twist, feet down", "Russian twist, feet up", "Russian twist, feet up, 2 sec each side"], cue: "Sit, lean back a little, hands together. Turn from your ribs, not just your arms. Same hip and shoulder separation you use when you swing." },
+  goblet:    { why: "Same squat pattern, now with load. Holding the bell in front forces you to stay upright.", sets: 3, reps: "8-10", rest: 75, levels: ["Goblet squat", "Goblet squat, 3 sec pause", "Goblet split squat (8 each)"], cue: "Hold the bell at your chest by the horns, elbows inside knees at the bottom, chest up." },
+  kbrdl:     { why: "Trains the hip hinge, which powers sprinting and jumping. Hamstrings and glutes do the work.", sets: 3, reps: "8", rest: 75, levels: ["Kettlebell deadlift", "Kettlebell Romanian deadlift", "Single leg KB Romanian deadlift (6 each)"], cue: "Push hips back, flat back, bell stays close to your legs. Stand tall and squeeze glutes." },
+  kblunge:   { why: "Loaded single leg strength. Builds the stride leg that catches your body when you throw.", sets: 3, reps: "6 each leg", rest: 60, levels: ["Goblet reverse lunge", "Goblet reverse lunge, 2 sec pause"], cue: "Same as your reverse lunge, bell held at your chest. Stay tall." },
+  kbrow:     { why: "Balances out all the pushing. A strong upper back protects your shoulder.", sets: 3, reps: "10 each arm", rest: 60, levels: ["One arm KB row (hand and knee on bench)", "One arm KB row, 2 sec squeeze"], cue: "Flat back, pull the bell to your hip pocket, don't twist your body." },
+  kbpress:   { why: "Overhead strength with your core braced in a half kneel, close to the position you're in when you throw.", sets: 3, reps: "8 each arm", rest: 60, levels: ["Half-kneeling KB press", "Half-kneeling KB press, 3 sec lower"], cue: "Down knee on the same side as the pressing arm. Squeeze that glute, ribs down, press straight up. Go light." },
+  carry:     { why: "Your core fights being pulled sideways the whole time. Bonus: a grip that won't quit.", sets: 3, reps: "30 sec each hand", rest: 45, levels: ["Suitcase carry", "Suitcase carry, slower and taller"], cue: "Bell in one hand, walk tall without leaning. Your core keeps you straight." },
+  kbstep:    { why: "Loaded single leg strength. One of the best carryovers to sprinting.", sets: 3, reps: "8 each leg", rest: 60, levels: ["Goblet step-up", "Goblet step-up, slow 3 sec lower"], cue: "Same rules as step-ups. Bell at your chest. Bench must be stable." },
+  swing:     { why: "Teaches an explosive hip snap. Same hip snap that drives a hard swing.", sets: 3, reps: "10", rest: 75, levels: ["Hip hinge drill (no swing yet)", "Two hand KB swing"], cue: "Learn this with a parent first. A swing is a hip snap, not a squat and not an arm lift." }
 };
 
 /* Stick figure poses. Each pose: head, neck, elbow, wrist, far elbow, far wrist, hip, knee, ankle, far knee, far ankle, [kettlebell]. Floor is y 131. */
@@ -319,6 +321,10 @@ const nums = (id) => (EX[id].reps.match(/\d+/g) || ["10"]).map(Number);
 const lowT = (id) => nums(id)[0];
 const topT = (id) => Math.max(...nums(id));
 
+const RANKS = [[0, "Rookie Ball"], [6, "Single-A"], [15, "Double-A"], [30, "Triple-A"], [50, "The Show"]];
+function rankIdx(n) { let i = 0; RANKS.forEach((r, k) => { if (n >= r[0]) i = k; }); return i; }
+function hello() { const h = new Date().getHours(); return h < 12 ? "Morning, Duke." : h < 17 ? "Afternoon, Duke." : "Evening, Duke."; }
+function repsLogged() { return S.log.reduce((n, l) => n + (l.ex || []).filter(x => x.unit === "reps").reduce((m, x) => m + x.vals.reduce((a, b) => a + b, 0), 0), 0); }
 function weekCount() {
   const now = new Date(); const back = (now.getDay() + 6) % 7;
   const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - back);
@@ -349,27 +355,37 @@ function render() {
 
 function todayHTML() {
   const d = dayOf(); const mins = 8 + d.ex.length * 5 + 4;
-  const resume = !!S.current;
+  const resume = !!S.current; const n = S.log.length; const ri = rankIdx(n);
+  const next = RANKS[ri + 1]; const from = RANKS[ri][0];
+  const pct = next ? Math.round((n - from) / (next[0] - from) * 100) : 100;
+  const wk = weekCount();
+  const sub = resume ? "You've got a workout going. Finish it out." : wk >= 3 ? "You already hit 3 this week. Extra day is optional. Recovery is when the gains actually happen." : n === 0 ? "Day one. Everybody starts in Rookie Ball." : `Workout #${n + 1} is on deck.`;
   return `
   <section class="card hero">
-    <p class="eyebrow">${resume ? "Workout in progress" : "Up next"}</p>
+    <p class="eyebrow">${hello()}</p>
     <h2>Day ${d.key}: ${d.name}</h2>
-    <p class="muted">${d.ex.length} exercises · about ${mins} min · warmup and cooldown included</p>
-    <button type="button" class="btn primary" data-act="${resume ? "resume" : "start"}">${resume ? "Resume workout" : "Start workout"}</button>
+    <p class="muted">${sub}</p>
+    <p class="muted">${d.ex.length} exercises · about ${mins} min with warmup and cooldown</p>
+    <button type="button" class="btn primary" data-act="${resume ? "resume" : "start"}">${resume ? "Get back in there" : "Let's go"}</button>
   </section>
   <div class="stats">
-    <div class="stat"><b>${weekCount()}/3</b><small>This week</small></div>
-    <div class="stat"><b>${S.log.length}</b><small>Total workouts</small></div>
-    <div class="stat"><b>${S.phase}</b><small>Phase</small></div>
+    <div class="stat"><b>${wk}/3</b><small>This week</small></div>
+    <div class="stat"><b>${n}</b><small>Workouts</small></div>
+    <div class="stat"><b>${repsLogged()}</b><small>Reps logged</small></div>
   </div>
   <section class="card">
-    <h3>How it works</h3>
+    <div class="ex-head"><div><p class="eyebrow">Your level</p><h3>${RANKS[ri][1]}</h3></div>${next ? `<span class="rx">${next[0] - n} to ${next[1]}</span>` : '<span class="badge done">Made it</span>'}</div>
+    <div class="progress" aria-label="Progress to next level"><i style="width:${pct}%"></i></div>
+    <p class="muted">${next ? `Every finished workout moves you up. ${next[1]} at ${next[0]} workouts.` : "You made The Show. Nobody stays here by accident. Keep showing up."}</p>
+  </section>
+  <section class="card">
+    <h3>How this works</h3>
     <ul class="plain">
-      <li>3 workouts a week, A then B then C. Take at least one rest day between workouts.</li>
-      <li>Watch the moving picture on each exercise before you start. Tap <b>Watch a video</b> if you need more help.</li>
-      <li>Use <b>−</b> and <b>+</b> to set how many reps (or seconds) you actually did, then tap <b>✓</b>. The rest timer starts on its own.</li>
-      <li>When an exercise says <b>Ready for Harder</b>, tap Harder.</li>
-      <li>If your form breaks down, the set is over.</li>
+      <li>Three workouts a week: A, then B, then C. Never two days in a row. Your muscles get stronger while you rest, not while you lift.</li>
+      <li>Watch the stick figure before each exercise. Still not sure? Hit <b>Watch a video</b>.</li>
+      <li>Log what you <i>actually</i> did with <b>−</b> and <b>+</b>, then tap <b>✓</b>. The rest timer runs on its own.</li>
+      <li>The app tracks your numbers. When you max out the rep range two workouts in a row, it tells you you're ready to level up. That's called progressive overload, and it's how every pro gets stronger.</li>
+      <li>Sloppy rep? Set's over. Bad reps train bad habits.</li>
     </ul>
   </section>`;
 }
@@ -407,8 +423,9 @@ function exCard(id) {
     </div>
     ${demoHTML(id)}
     <p class="cue">${e.cue}</p>
+    <p class="why"><b>Why it matters:</b> ${e.why}</p>
     <div class="sets">${setRows}</div>
-    <div class="last">${last ? `Last time: <b>${last.vals.join(", ")}</b> ${unit}` : "First time at this level"}${readyToLevel(id) ? ' <span class="badge done">Ready for Harder</span>' : ""}</div>
+    <div class="last">${last ? `Last time: <b>${last.vals.join(", ")}</b> ${unit}` : "First time at this level. Set the baseline."}${readyToLevel(id) ? ' <span class="badge done">Ready to level up</span>' : ""}</div>
     <div class="row">
       <button type="button" class="btn small ghost" data-act="lvl" data-id="${id}" data-d="-1" ${L === 0 ? "disabled" : ""}>Easier</button>
       <button type="button" class="btn small ghost" data-act="lvl" data-id="${id}" data-d="1" ${L === e.levels.length - 1 ? "disabled" : ""}>Harder</button>
@@ -437,8 +454,8 @@ function workoutHTML() {
     <div class="ex-head"><h3>Cooldown</h3><span class="rx">5 min</span></div>
     <ul class="plain">${COOLDOWN.map(w => `<li>${w}</li>`).join("")}</ul>
   </section>
-  <button type="button" class="btn primary" data-act="finish" ${dn === 0 ? "disabled" : ""}>Finish and save workout</button>
-  <button type="button" class="btn ghost" data-act="quit">${confirmKey === "quit" ? "Tap again to quit without saving" : "Quit workout"}</button>`;
+  <button type="button" class="btn primary" data-act="finish" ${dn === 0 ? "disabled" : ""}>Log it and finish</button>
+  <button type="button" class="btn ghost" data-act="quit">${confirmKey === "quit" ? "Tap again to bail (nothing gets saved)" : "Quit workout"}</button>`;
 }
 
 function programHTML() {
@@ -449,28 +466,28 @@ function programHTML() {
   return `
   <section class="card">
     <div class="ex-head"><div><p class="eyebrow">Phase 1</p><h2>${PHASES[1].name}</h2></div>${S.phase === 1 ? '<span class="badge done">Current</span>' : ""}</div>
-    <p class="muted">Bodyweight only. Build form, control, and a base of strength. Plan on at least 6 to 8 weeks here.</p>
+    <p class="muted">Bodyweight only. This is where you build the foundation: form, control, and real strength. Plan on 6 to 8 weeks here. No shortcuts.</p>
     <div class="daylist">${block(1)}</div>
     ${S.phase !== 1 ? '<button type="button" class="btn" data-act="phase" data-p="1">Switch to Phase 1</button>' : ""}
   </section>
   <section class="card">
     <div class="ex-head"><div><p class="eyebrow">Phase 2</p><h2>${PHASES[2].name}</h2></div>${S.phase === 2 ? '<span class="badge done">Current</span>' : p2open ? "" : '<span class="badge lock">Locked</span>'}</div>
-    <p class="muted">Kettlebells added. Start with the lightest bell you have and go up only when every rep looks clean.</p>
+    <p class="muted">Now we add load. Start with the lightest bell and only go heavier when every single rep looks clean.</p>
     <div class="daylist">${block(2)}</div>
     ${p2open
       ? (S.phase !== 2 ? '<button type="button" class="btn primary" data-act="phase" data-p="2">Switch to Phase 2</button>' : "")
-      : `<p class="warn">A parent unlocks this phase after checking form on squats, lunges, and push-ups.</p>
+      : `<p class="warn">Dad unlocks this once he signs off on your squat, lunge, and push-up form. Earn it.</p>
          <form class="row" id="unlockForm"><input type="password" id="unlockCode" inputmode="numeric" placeholder="Parent code" aria-label="Parent code"><button type="submit" class="btn">Unlock</button></form>
-         <p class="muted" id="unlockMsg" hidden>That code didn't match. Ask a parent.</p>`}
+         <p class="muted" id="unlockMsg" hidden>Wrong code. Nice try though.</p>`}
   </section>
   <section class="card">
     <div class="ex-head"><div><p class="eyebrow">Phase 3</p><h2>Barbell Basics</h2></div><span class="badge lock">Parent present</span></div>
-    <p class="muted">Barbell squat, Romanian deadlift, and bench press with an empty or very light bar. These only happen with a parent in the room and a spotter on bench press. Not built yet. A parent adds this when you're ready.</p>
+    <p class="muted">Barbell squat, Romanian deadlift, and bench press, starting with an empty bar. Dad has to be in the room, and bench press always needs a spotter. Not built yet. This unlocks when you're ready for it.</p>
   </section>`;
 }
 
 function logHTML() {
-  if (!S.log.length) return `<section class="card"><h3>No workouts yet</h3><p class="muted">Finish your first workout and it shows up here with every set you did.</p></section>`;
+  if (!S.log.length) return `<section class="card"><h3>No workouts yet</h3><p class="muted">Your first workout shows up here, every set and rep. In a few weeks, scroll back and compare. That's the fun part.</p></section>`;
   const rows = S.log.slice().reverse().map(l => `
     <div class="log-item">
       <div class="log-top"><div><b>Day ${l.key}: ${l.name}</b><p class="muted">${fmtDate(l.date)} · Phase ${l.phase}</p></div><span class="rx">${l.sets}/${l.total} sets</span></div>
@@ -484,24 +501,24 @@ function logHTML() {
 function rulesHTML() {
   return `
   <section class="card">
-    <h2>Training rules</h2>
+    <h2>Ground rules</h2>
     <ul class="plain">
-      <li><b>Form first.</b> If form breaks, the set is over. Never add weight to bad reps.</li>
-      <li><b>Log what you really did.</b> Fewer reps with good form beats more reps with bad form.</li>
-      <li><b>Rest days matter.</b> Don't train two days in a row. Muscles grow on rest days.</li>
-      <li><b>Pain means stop.</b> Sore muscles the next day are normal. Sharp pain or joint pain is not. Stop and tell a parent.</li>
-      <li><b>No max lifts.</b> We never test how much you can lift one time.</li>
-      <li><b>Throwing days count.</b> On heavy throwing or pitching days, skip Day B or just do the Y-T-W raises.</li>
-      <li><b>Barbell and bench press</b> only with a parent in the room.</li>
-      <li><b>Fuel up.</b> Drink water, and eat a real meal or snack after training.</li>
+      <li><b>Form beats numbers.</b> Ten perfect reps beat fifteen ugly ones. If form breaks, the set is over.</li>
+      <li><b>Log honestly.</b> The app only helps if the numbers are real. Nobody's grading you except you.</li>
+      <li><b>Rest days are part of the program.</b> Training breaks muscle down a little. Rest is when it rebuilds stronger. Skip rest and you skip the gains.</li>
+      <li><b>Sore is fine. Pain is not.</b> Achy muscles the next day are normal. Sharp pain or anything in a joint means stop and tell Dad.</li>
+      <li><b>No max outs.</b> We never test how much you can lift one time. Not worth it at 12.</li>
+      <li><b>Your arm comes first.</b> Big throwing or pitching day? Skip Day B, or just do the Y-T-W raises.</li>
+      <li><b>Barbell and bench press</b> only with Dad in the room.</li>
+      <li><b>Refuel.</b> Water, plus a real meal or snack with some protein after training.</li>
     </ul>
   </section>
   <section class="card">
     <h3>Put this on your phone</h3>
     <ul class="plain">
-      <li>iPhone: open this page in Safari, tap Share, then Add to Home Screen.</li>
+      <li>iPhone: open this in Safari, tap Share, then Add to Home Screen.</li>
       <li>Android: open in Chrome, tap the menu, then Add to Home screen.</li>
-      <li>Your progress saves on the phone you use. Stick with one phone.</li>
+      <li>Your data lives on your phone. Use the same one every time.</li>
     </ul>
   </section>`;
 }
@@ -594,7 +611,7 @@ document.addEventListener("click", (ev) => {
     s.d = !s.d; save();
     const d = PHASES[S.current.phase].days[S.current.day];
     if (s.d && doneSets() < totalSets(d)) startTimer(EX[id].rest);
-    if (doneSets() === totalSets(d)) { stopTimer(); toast("All sets done. Cool down and tap Finish."); }
+    if (doneSets() === totalSets(d)) { stopTimer(); toast("Every set done. Cool down, then log it."); }
     render();
   } else if (act === "lvl") {
     const id = b.dataset.id; S.levels[id] = Math.max(0, Math.min(EX[id].levels.length - 1, lvl(id) + +b.dataset.d));
@@ -603,10 +620,13 @@ document.addEventListener("click", (ev) => {
   } else if (act === "finish") {
     const c = S.current; const d = PHASES[c.phase].days[c.day];
     const ex = d.ex.map(id => ({ id, name: EX[id].levels[lvl(id)], unit: unitOf(id), vals: c.sets[id].filter(s => s.d).map(s => s.v) }));
+    const before = rankIdx(S.log.length);
     S.log.push({ date: new Date().toISOString(), phase: c.phase, key: d.key, name: d.name, sets: doneSets(), total: totalSets(d), ex });
     S.next[c.phase] = (c.day + 1) % 3; S.current = null; save(); stopTimer();
     try { wake && wake.release(); } catch (e) {}
-    view = "today"; render(); window.scrollTo(0, 0); toast("Workout saved. Nice work.");
+    const after = rankIdx(S.log.length);
+    view = "today"; render(); window.scrollTo(0, 0);
+    toast(after > before ? `Called up to ${RANKS[after][1]}. Let's go, Duke.` : `Workout #${S.log.length} in the books.`);
   } else if (act === "quit") {
     if (confirmKey === "quit") { S.current = null; save(); stopTimer(); confirmKey = null; view = "today"; render(); window.scrollTo(0, 0); }
     else { confirmKey = "quit"; render(); }
@@ -614,7 +634,7 @@ document.addEventListener("click", (ev) => {
     if (confirmKey === "clearlog") { S.log = []; save(); confirmKey = null; render(); }
     else { confirmKey = "clearlog"; render(); }
   } else if (act === "phase") {
-    if (S.current) { toast("Finish or quit your current workout first."); return; }
+    if (S.current) { toast("Finish or quit the workout you started first."); return; }
     S.phase = +b.dataset.p; save(); render(); toast(`Switched to ${PHASES[S.phase].name}.`);
   } else if (act === "timer-add") { tEnd += 15000; if (!tInt) { tInt = setInterval(tick, 250); $("timer").hidden = false; } tick(); }
   else if (act === "timer-skip") { stopTimer(); }
@@ -627,7 +647,7 @@ document.addEventListener("change", (ev) => {
 document.addEventListener("submit", (ev) => {
   if (ev.target.id !== "unlockForm") return;
   ev.preventDefault();
-  if ($("unlockCode").value.trim() === PARENT_CODE) { S.unlocked = 2; save(); render(); toast("Phase 2 unlocked."); }
+  if ($("unlockCode").value.trim() === PARENT_CODE) { S.unlocked = 2; save(); render(); toast("Phase 2 unlocked. Kettlebells are in play."); }
   else { $("unlockMsg").hidden = false; }
 });
 render();
