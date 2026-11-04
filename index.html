@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Diamond">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Diamond Strength</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: one narrow phone column; segmented tabs pinned on top, rest timer pinned on bottom, workout as a stack of exercise cards with a demo, set counters and history */
+:root {
+  --bg: #F1F4F1;
+  --surface: #FFFFFF;
+  --ink: #14213A;
+  --muted: #5A6577;
+  --faint: #A9B3BF;
+  --line: #D6DCD6;
+  --clay: #B9502A;
+  --clay-ink: #FFFFFF;
+  --grass: #2E7A4C;
+  --grass-soft: #E3F1E8;
+  --clay-soft: #F7E7DF;
+  --display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --body: "Barlow", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0D1421; --surface: #162033; --ink: #E7ECF3; --muted: #97A2B4; --faint: #56637A; --line: #26324A;
+    --clay: #E07A4C; --clay-ink: #14100D; --grass: #4CB37A; --grass-soft: #17322A; --clay-soft: #33221B;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0D1421; --surface: #162033; --ink: #E7ECF3; --muted: #97A2B4; --faint: #56637A; --line: #26324A;
+  --clay: #E07A4C; --clay-ink: #14100D; --grass: #4CB37A; --grass-soft: #17322A; --clay-soft: #33221B;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--body); font-size: 16px; line-height: 1.45;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 120px;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.app { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+.top { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding-top: 20px; }
+.brand { font-family: var(--display); font-weight: 700; font-size: 34px; line-height: 1; letter-spacing: .01em; text-transform: uppercase; margin: 0; }
+.brand span { color: var(--clay); }
+.pill { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; white-space: nowrap; }
+.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 8px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.tabs button { font: 600 14px var(--body); color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 8px; padding: 10px 4px; cursor: pointer; }
+.tabs button[aria-current="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+main { display: flex; flex-direction: column; gap: 14px; }
+h2 { font-family: var(--display); font-weight: 700; font-size: 28px; line-height: 1.05; text-transform: uppercase; margin: 0; text-wrap: balance; }
+h3 { font-family: var(--display); font-weight: 600; font-size: 22px; line-height: 1.1; margin: 0; text-wrap: balance; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0; }
+p { margin: 0; }
+.muted { color: var(--muted); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.hero { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.hero .eyebrow, .hero .muted { color: var(--bg); opacity: .75; }
+.hero h2 { font-size: 40px; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stat { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--surface); }
+.stat b { display: block; font-family: var(--display); font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }
+.stat small { font-size: 12px; color: var(--muted); }
+.btn { font: 600 16px var(--body); border-radius: 10px; padding: 14px 16px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; text-align: center; text-decoration: none; display: inline-block; }
+.btn.primary { background: var(--clay); color: var(--clay-ink); border-color: var(--clay); }
+.btn.small { font-size: 14px; padding: 8px 12px; }
+.btn.ghost { background: transparent; }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+button:focus-visible, input:focus-visible, a:focus-visible { outline: 3px solid var(--clay); outline-offset: 2px; }
+ul.plain { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+.ex-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.ex-head > div { min-width: 0; }
+.rx { font-family: var(--display); font-weight: 600; font-size: 20px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.lvl { font-size: 13px; color: var(--muted); }
+.cue { font-size: 15px; color: var(--muted); }
+.badge { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 3px 8px; border-radius: 6px; white-space: nowrap; align-self: flex-start; }
+.badge.done { background: var(--grass-soft); color: var(--grass); }
+.badge.lock { background: var(--clay-soft); color: var(--clay); }
+.warn { background: var(--clay-soft); color: var(--ink); border-radius: 8px; padding: 10px 12px; font-size: 14px; }
+.progress { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.progress i { display: block; height: 100%; background: var(--grass); transition: width .3s; }
+.check { display: flex; gap: 10px; align-items: center; font-weight: 600; cursor: pointer; }
+.check input { width: 22px; height: 22px; accent-color: var(--grass); }
+input[type="password"] { font: 500 16px var(--body); padding: 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); width: 140px; }
+
+/* demo figure */
+.demo-wrap { background: var(--bg); border-radius: 10px; padding: 8px; display: flex; flex-direction: column; gap: 4px; }
+.demo { width: 100%; height: auto; max-height: 200px; display: block; }
+.demo .near { stroke: var(--ink); stroke-width: 6; stroke-linecap: round; fill: none; }
+.demo .far { stroke: var(--faint); stroke-width: 6; stroke-linecap: round; fill: none; }
+.demo .head { fill: var(--ink); }
+.demo .floor { stroke: var(--line); stroke-width: 2; }
+.demo .prop { fill: var(--line); }
+.demo .kb { fill: var(--clay); }
+.demo-cap { font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+
+/* set rows */
+.sets { display: flex; flex-direction: column; gap: 8px; }
+.setrow { display: grid; grid-template-columns: 44px 44px minmax(56px, 72px) 44px 1fr 52px; gap: 6px; align-items: center; }
+.setrow .lbl { font-size: 13px; font-weight: 600; color: var(--muted); }
+.setrow .unit { font-size: 13px; color: var(--muted); }
+.step { width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: 700 22px var(--body); cursor: pointer; line-height: 1; }
+.val { width: 100%; height: 44px; text-align: center; font: 700 22px var(--display); border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-variant-numeric: tabular-nums; -moz-appearance: textfield; }
+.val::-webkit-outer-spin-button, .val::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.set { width: 52px; height: 44px; border-radius: 10px; border: 2px solid var(--line); background: var(--bg); color: var(--muted); font: 700 18px var(--body); cursor: pointer; }
+.set[aria-pressed="true"] { background: var(--grass); border-color: var(--grass); color: var(--surface); }
+.setrow.is-done .val { border-color: var(--grass); }
+.last { font-size: 14px; color: var(--muted); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.last b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.vid { font-size: 14px; font-weight: 600; color: var(--clay); text-decoration: none; margin-left: auto; padding: 8px 4px; }
+
+.log-item { display: flex; flex-direction: column; gap: 6px; padding-block: 12px; border-bottom: 1px solid var(--line); }
+.log-item:last-child { border-bottom: 0; }
+.log-top { display: flex; justify-content: space-between; gap: 12px; }
+.log-top b { font-weight: 600; }
+.log-ex { font-size: 14px; color: var(--muted); display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; }
+.log-ex span:nth-child(even) { color: var(--ink); font-variant-numeric: tabular-nums; text-align: right; }
+.daylist { display: flex; flex-direction: column; gap: 10px; }
+.timer { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--ink); color: var(--bg);
+  padding: 12px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.timer-in { max-width: 560px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.timer .count { font-family: var(--display); font-weight: 700; font-size: 40px; line-height: 1; font-variant-numeric: tabular-nums; }
+.timer .btn { background: transparent; color: var(--bg); border-color: var(--bg); }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(96px + env(safe-area-inset-bottom, 0px)); z-index: 30; background: var(--grass); color: #fff; font-weight: 600; padding: 10px 16px; border-radius: 10px; max-width: calc(100% - 32px); }
+@media (max-width: 380px) { .setrow { grid-template-columns: 38px 40px minmax(48px, 64px) 40px 1fr 48px; gap: 4px; } .step { width: 40px; } .set { width: 48px; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="app">
+  <header class="top">
+    <h1 class="brand">Diamond <span>Strength</span></h1>
+    <span class="pill" id="phasePill"></span>
+  </header>
+  <nav class="tabs" aria-label="Sections">
+    <button type="button" data-view="today">Today</button>
+    <button type="button" data-view="program">Program</button>
+    <button type="button" data-view="log">Log</button>
+    <button type="button" data-view="rules">Rules</button>
+  </nav>
+  <main id="view"></main>
+</div>
+
+<div class="timer" id="timer" hidden>
+  <div class="timer-in">
+    <div><p class="eyebrow" style="color:inherit;opacity:.75">Rest</p><div class="count" id="timerCount">0:00</div></div>
+    <div class="row">
+      <button type="button" class="btn small" data-act="timer-add">+15s</button>
+      <button type="button" class="btn small" data-act="timer-skip">Skip</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+// Parent code that unlocks the kettlebell phase. Change it to anything you like.
+const PARENT_CODE = "2026";
+const KEY = "diamond-strength-v1";
+
+const EX = {
+  squat:     { sets: 3, reps: "10-15", rest: 60, levels: ["Bodyweight squat", "Pause squat (3 sec at the bottom)", "Split squat", "Bulgarian split squat (back foot on bench)"], cue: "Chest up, knees track over toes, sit down like you're getting into a catcher's stance." },
+  revlunge:  { sets: 3, reps: "8 each leg", rest: 60, levels: ["Reverse lunge", "Reverse lunge, 2 sec pause at the bottom", "Reverse lunge with knee drive"], cue: "Step back, back knee lightly touches the floor, push up through the front heel." },
+  latlunge:  { sets: 2, reps: "6 each side", rest: 45, levels: ["Lateral lunge", "Lateral lunge with pause", "Cossack squat"], cue: "Like a big lead off step: sit into one hip, other leg straight, both feet flat." },
+  bridge:    { sets: 3, reps: "12", rest: 45, levels: ["Glute bridge", "Glute bridge, 3 sec squeeze at top", "Single leg glute bridge (12 each)"], cue: "Lie on your back, knees bent. Push through your heels, squeeze glutes at the top, keep ribs down." },
+  sideplank: { sets: 2, reps: "20-30 sec each side", rest: 30, levels: ["Side plank from knees", "Side plank", "Side plank with top leg raised"], cue: "Elbow right under your shoulder. Lift hips until you make a straight line from head to feet, then hold." },
+  deadbug:   { sets: 3, reps: "6 each side", rest: 30, levels: ["Dead bug", "Dead bug, 3 sec slow reach", "Dead bug, both legs low"], cue: "On your back, arms up, knees bent. Reach one arm back and the OPPOSITE leg out. Low back stays pressed into the floor." },
+  pushup:    { sets: 3, reps: "6-12", rest: 75, levels: ["Incline push-up (hands on bench)", "Push-up", "Push-up, 3 sec lower", "Push-up, feet on bench"], cue: "Body stays a straight plank, elbows about 45 degrees from your sides, chest close to the floor or bench." },
+  pike:      { sets: 3, reps: "5-8", rest: 60, levels: ["Pike push-up, small range", "Pike push-up", "Pike push-up, slow lower"], cue: "Hips high like an upside down V. Bend your elbows and lower the top of your head toward the floor in front of your hands." },
+  ytw:       { sets: 2, reps: "6 of each letter", rest: 45, levels: ["Prone Y-T-W raises", "Prone Y-T-W, 2 sec hold each"], cue: "Lie face down, thumbs up. Lift your arms off the floor into a Y, then a T, then a W. Light and controlled. This is arm care for throwing." },
+  plank:     { sets: 3, reps: "20-30 sec", rest: 30, levels: ["Plank", "Plank shoulder taps", "Plank shoulder taps, feet close together"], cue: "Squeeze glutes and stomach, hips stay level. No rocking side to side." },
+  hollow:    { sets: 3, reps: "15-25 sec", rest: 30, levels: ["Hollow hold, knees bent", "Hollow hold, legs straight", "Hollow rocks"], cue: "On your back, lift arms, shoulders and legs a few inches off the floor. Low back glued down. If it pops up, go back a level." },
+  stepup:    { sets: 3, reps: "8 each leg", rest: 60, levels: ["Step-up onto bench", "Step-up, slow 3 sec lower", "Step-up with knee drive"], cue: "Whole foot on the bench, drive through that heel. Don't push off the back foot. Make sure the bench can't tip." },
+  squatjump: { sets: 3, reps: "5", rest: 75, levels: ["Squat jump, stick the landing", "Squat jump", "Broad jump, stick the landing"], cue: "Swing arms, jump up, land soft and quiet with knees out. Rest fully. Every rep should be your best rep." },
+  skater:    { sets: 3, reps: "5 each side", rest: 60, levels: ["Skater step (no jump)", "Skater hop, hold landing 2 sec", "Continuous skater hops"], cue: "Push sideways like you're stealing second, land on one leg and hold it." },
+  bear:      { sets: 3, reps: "20 sec", rest: 45, levels: ["Bear hold (knees 1 inch off floor)", "Bear crawl forward and back", "Lateral bear crawl"], cue: "Hands under shoulders, knees under hips. Back flat like a table, knees just off the floor, move slow." },
+  twist:     { sets: 3, reps: "10 each side", rest: 45, levels: ["Russian twist, feet down", "Russian twist, feet up", "Russian twist, feet up, 2 sec each side"], cue: "Sit, lean back a little, hands together. Turn from your ribs, not just your arms. Same hip and shoulder separation you use when you swing." },
+  goblet:    { sets: 3, reps: "8-10", rest: 75, levels: ["Goblet squat", "Goblet squat, 3 sec pause", "Goblet split squat (8 each)"], cue: "Hold the bell at your chest by the horns, elbows inside knees at the bottom, chest up." },
+  kbrdl:     { sets: 3, reps: "8", rest: 75, levels: ["Kettlebell deadlift", "Kettlebell Romanian deadlift", "Single leg KB Romanian deadlift (6 each)"], cue: "Push hips back, flat back, bell stays close to your legs. Stand tall and squeeze glutes." },
+  kblunge:   { sets: 3, reps: "6 each leg", rest: 60, levels: ["Goblet reverse lunge", "Goblet reverse lunge, 2 sec pause"], cue: "Same as your reverse lunge, bell held at your chest. Stay tall." },
+  kbrow:     { sets: 3, reps: "10 each arm", rest: 60, levels: ["One arm KB row (hand and knee on bench)", "One arm KB row, 2 sec squeeze"], cue: "Flat back, pull the bell to your hip pocket, don't twist your body." },
+  kbpress:   { sets: 3, reps: "8 each arm", rest: 60, levels: ["Half-kneeling KB press", "Half-kneeling KB press, 3 sec lower"], cue: "Down knee on the same side as the pressing arm. Squeeze that glute, ribs down, press straight up. Go light." },
+  carry:     { sets: 3, reps: "30 sec each hand", rest: 45, levels: ["Suitcase carry", "Suitcase carry, slower and taller"], cue: "Bell in one hand, walk tall without leaning. Your core keeps you straight." },
+  kbstep:    { sets: 3, reps: "8 each leg", rest: 60, levels: ["Goblet step-up", "Goblet step-up, slow 3 sec lower"], cue: "Same rules as step-ups. Bell at your chest. Bench must be stable." },
+  swing:     { sets: 3, reps: "10", rest: 75, levels: ["Hip hinge drill (no swing yet)", "Two hand KB swing"], cue: "Learn this with a parent first. A swing is a hip snap, not a squat and not an arm lift." }
+};
+
+/* Stick figure poses. Each pose: head, neck, elbow, wrist, far elbow, far wrist, hip, knee, ankle, far knee, far ankle, [kettlebell]. Floor is y 131. */
+const STAND = [100,32, 100,44, 101,62, 103,80, 99,62, 101,80, 100,80, 101,104, 100,128, 99,104, 100,128];
+const PLANK = [140,88, 128,94, 129,112, 130,128, 127,112, 128,128, 90,109, 70,118, 50,126, 70,118, 50,126];
+const SQ_BOT = [101,59, 96,71, 114,72, 132,72, 113,74, 131,74, 82,104, 106,100, 100,128, 105,101, 99,128];
+const BEAR_UP = [140,92, 128,96, 129,112, 130,128, 127,112, 128,128, 84,94, 86,120, 62,128, 86,120, 62,128];
+const DEMO = {
+  squat: { p: [[100,32, 100,44, 118,45, 136,45, 117,47, 135,47, 100,80, 101,104, 100,128, 99,104, 100,128], SQ_BOT] },
+  revlunge: { p: [STAND, [99,50, 99,62, 100,80, 102,96, 98,80, 100,96, 98,98, 120,100, 118,128, 86,121, 64,126]] },
+  latlunge: { view: "Seen from the front", foot: false, p: [
+    [100,32, 100,44, 112,58, 101,62, 88,58, 99,62, 100,80, 114,104, 122,128, 86,104, 78,128],
+    [106,54, 107,66, 119,80, 108,84, 95,80, 106,84, 112,100, 134,106, 132,128, 92,114, 70,128]] },
+  bridge: { p: [
+    [44,119, 58,124, 76,126, 94,127, 76,126, 94,127, 100,126, 118,104, 130,128, 118,104, 130,128],
+    [44,119, 58,124, 76,126, 94,127, 76,126, 94,127, 100,106, 122,98, 128,128, 122,98, 128,128]] },
+  sideplank: { foot: false, hold: true, view: "Seen from the front", p: [
+    [52,100, 64,106, 64,128, 78,128, 78,100, 96,110, 100,124, 124,126, 148,127, 124,126, 148,127],
+    [52,100, 64,106, 64,128, 78,128, 78,96, 96,106, 100,113, 124,120, 148,126, 124,120, 148,126]] },
+  deadbug: { foot: false, p: [
+    [44,119, 58,123, 60,103, 62,84, 58,103, 60,84, 100,125, 100,101, 124,101, 100,101, 124,101],
+    [44,119, 58,123, 40,106, 22,106, 58,103, 60,84, 100,125, 100,101, 124,101, 122,114, 146,118]] },
+  pushup: [
+    { bench: [118,104,52], p: [
+      [140,72, 128,78, 131,91, 134,104, 130,91, 133,104, 89,103, 70,115, 50,127, 70,115, 50,127],
+      [136,90, 124,96, 116,92, 134,104, 115,93, 133,104, 88,112, 69,120, 50,127, 69,120, 50,127]] },
+    { p: [PLANK, [141,111, 129,116, 114,108, 130,128, 113,108, 129,128, 90,121, 70,124, 50,127, 70,124, 50,127]] }],
+  pike: { p: [
+    [118,108, 112,102, 116,115, 120,128, 115,115, 119,128, 92,76, 78,102, 64,126, 78,102, 64,126],
+    [128,118, 118,112, 106,110, 120,128, 105,110, 119,128, 96,80, 80,104, 64,126, 80,104, 64,126]] },
+  ytw: { view: "Seen from above, lying face down", foot: false, speed: 1300, p: [
+    [100,22, 100,34, 114,20, 126,6, 86,20, 74,6, 100,80, 106,104, 108,126, 94,104, 92,126],
+    [100,22, 100,34, 120,34, 138,34, 80,34, 62,34, 100,80, 106,104, 108,126, 94,104, 92,126],
+    [100,22, 100,34, 116,46, 126,30, 84,46, 74,30, 100,80, 106,104, 108,126, 94,104, 92,126]] },
+  plank: [
+    { hold: true, p: [PLANK] },
+    { p: [PLANK, [140,88, 128,94, 136,108, 126,98, 127,112, 128,128, 90,109, 70,118, 50,126, 70,118, 50,126]] }],
+  hollow: { foot: false, hold: true, p: [
+    [46,118, 56,124, 38,126, 22,126, 38,126, 22,126, 96,126, 120,127, 144,127, 120,127, 144,127],
+    [48,110, 58,116, 42,108, 26,102, 42,108, 26,102, 96,126, 119,118, 142,110, 119,118, 142,110]] },
+  stepup: { bench: [108,106,60], p: [
+    [93,32, 92,44, 93,62, 95,80, 91,62, 93,80, 90,80, 110,84, 116,106, 91,104, 90,128],
+    [118,10, 118,22, 119,40, 121,58, 117,40, 119,58, 118,58, 119,82, 118,106, 117,82, 116,106]] },
+  squatjump: { p: [
+    [101,59, 96,71, 84,86, 76,100, 85,87, 77,101, 82,104, 106,100, 100,128, 105,101, 99,128],
+    [100,10, 100,22, 116,16, 132,8, 115,18, 131,10, 100,58, 101,82, 99,106, 99,82, 98,106]] },
+  skater: { view: "Seen from the front", foot: false, p: [
+    [72,38, 70,50, 80,62, 88,74, 58,58, 52,70, 64,86, 62,108, 60,128, 72,110, 82,120],
+    [100,18, 100,30, 112,40, 120,52, 88,40, 80,52, 100,66, 96,90, 92,110, 106,88, 110,108],
+    [128,38, 130,50, 120,62, 112,74, 142,58, 148,70, 136,86, 138,108, 140,128, 128,110, 118,120],
+    [100,18, 100,30, 112,40, 120,52, 88,40, 80,52, 100,66, 96,90, 92,110, 106,88, 110,108]] },
+  bear: [
+    { hold: true, p: [[140,92, 128,96, 129,112, 130,128, 127,112, 128,128, 84,96, 84,126, 60,127, 84,126, 60,127], BEAR_UP] },
+    { p: [BEAR_UP, [146,92, 134,96, 137,112, 142,128, 130,112, 128,128, 90,94, 88,120, 62,128, 96,120, 72,128]] }],
+  twist: { view: "Seen from the front, sitting", foot: false, p: [
+    [98,66, 99,78, 86,90, 78,104, 92,96, 79,105, 100,112, 112,96, 118,126, 88,96, 82,126],
+    [102,66, 101,78, 108,96, 121,105, 114,90, 122,104, 100,112, 112,96, 118,126, 88,96, 82,126]] },
+  goblet: { p: [
+    [100,32, 100,44, 104,62, 110,52, 103,63, 109,53, 100,80, 101,104, 100,128, 99,104, 100,128, 112,58],
+    [101,59, 96,71, 100,88, 108,80, 99,89, 107,81, 82,104, 106,100, 100,128, 105,101, 99,128, 110,86]] },
+  kbrdl: { p: [
+    [100,32, 100,44, 101,62, 102,80, 99,62, 100,80, 100,80, 101,104, 100,128, 99,104, 100,128, 102,90],
+    [128,56, 117,62, 117,81, 117,99, 116,81, 116,99, 86,80, 98,104, 100,128, 97,104, 99,128, 117,109]] },
+  kblunge: { p: [
+    [100,32, 100,44, 104,62, 110,52, 103,63, 109,53, 100,80, 101,104, 100,128, 99,104, 100,128, 112,58],
+    [99,50, 99,62, 103,80, 109,70, 102,81, 108,71, 98,98, 120,100, 118,128, 86,121, 64,126, 111,76]] },
+  kbrow: { bench: [70,100,100], p: [
+    [148,74, 136,80, 134,96, 134,112, 138,92, 140,100, 100,80, 92,104, 88,128, 104,100, 82,100, 134,120],
+    [148,74, 136,80, 120,70, 124,88, 138,92, 140,100, 100,80, 92,104, 88,128, 104,100, 82,100, 124,96]] },
+  kbpress: { p: [
+    [100,56, 100,68, 106,84, 108,70, 99,86, 101,104, 100,104, 96,128, 74,128, 124,104, 122,128, 110,66],
+    [100,56, 100,68, 103,50, 104,32, 99,86, 101,104, 100,104, 96,128, 74,128, 124,104, 122,128, 105,26]] },
+  carry: { p: [
+    [100,32, 100,44, 101,62, 102,80, 97,62, 94,80, 100,80, 108,102, 114,128, 94,103, 86,128, 102,90],
+    [100,32, 100,44, 101,62, 102,80, 103,62, 106,80, 100,80, 94,103, 86,128, 108,102, 114,128, 102,90]] },
+  kbstep: { bench: [108,106,60], p: [
+    [93,32, 92,44, 98,62, 104,52, 97,63, 103,53, 90,80, 110,84, 116,106, 91,104, 90,128, 106,58],
+    [118,10, 118,22, 124,40, 130,30, 123,41, 129,31, 118,58, 119,82, 118,106, 117,82, 116,106, 132,36]] },
+  swing: [
+    { p: [STAND, [122,54, 112,60, 112,78, 112,96, 111,79, 111,97, 82,82, 96,104, 98,128, 95,104, 97,128]] },
+    { p: [
+      [122,54, 112,60, 104,78, 96,92, 103,79, 95,93, 82,82, 96,104, 98,128, 95,104, 97,128, 92,100],
+      [100,32, 100,44, 119,46, 137,48, 118,48, 136,50, 100,80, 101,104, 100,128, 99,104, 100,128, 144,52]] }]
+};
+
+const PHASES = {
+  1: { name: "Bodyweight Foundation", short: "Phase 1 · Bodyweight", days: [
+    { key: "A", name: "Legs & Core", ex: ["squat", "revlunge", "latlunge", "bridge", "sideplank", "deadbug"] },
+    { key: "B", name: "Upper Body & Arm Care", ex: ["pushup", "pike", "ytw", "plank", "hollow"] },
+    { key: "C", name: "Athletic Power", ex: ["stepup", "squatjump", "skater", "bear", "twist"] }
+  ]},
+  2: { name: "Kettlebell Strength", short: "Phase 2 · Kettlebell", days: [
+    { key: "A", name: "Legs & Core", ex: ["goblet", "kbrdl", "kblunge", "bridge", "sideplank"] },
+    { key: "B", name: "Upper Body & Arm Care", ex: ["pushup", "kbrow", "kbpress", "ytw", "carry"] },
+    { key: "C", name: "Athletic Power", ex: ["kbstep", "squatjump", "swing", "skater", "twist"] }
+  ]}
+};
+
+const WARMUP = ["Easy treadmill walk or jog, 4 min", "Arm circles, 10 forward and 10 back", "Leg swings, 10 each leg front to back", "Walking lunge with overhead reach, 6 each leg", "Inchworms, 5"];
+const COOLDOWN = ["Easy treadmill walk, 3 min", "Hip flexor stretch, 30 sec each side", "Hamstring stretch, 30 sec each side", "Cross body shoulder stretch, 30 sec each arm"];
+
+function defaults() { return { phase: 1, unlocked: 1, next: { 1: 0, 2: 0 }, levels: {}, log: [], current: null }; }
+let mem = null;
+function load() {
+  try { const raw = localStorage.getItem(KEY); if (raw) return Object.assign(defaults(), JSON.parse(raw)); } catch (e) {}
+  return mem || defaults();
+}
+function save() { mem = S; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+let S = load();
+if (S.current && !S.current.sets) S.current = null; // drop an in-progress workout from the older version
+let view = S.current ? "workout" : "today";
+let confirmKey = null;
+
+const $ = (id) => document.getElementById(id);
+const lvl = (id) => Math.min(S.levels[id] || 0, EX[id].levels.length - 1);
+const dayOf = () => PHASES[S.phase].days[(S.next[S.phase] || 0) % 3];
+const unitOf = (id) => /sec/.test(EX[id].reps) ? "sec" : "reps";
+const nums = (id) => (EX[id].reps.match(/\d+/g) || ["10"]).map(Number);
+const lowT = (id) => nums(id)[0];
+const topT = (id) => Math.max(...nums(id));
+
+function weekCount() {
+  const now = new Date(); const back = (now.getDay() + 6) % 7;
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - back);
+  return S.log.filter(l => new Date(l.date) >= start).length;
+}
+function totalSets(day) { return day.ex.reduce((n, id) => n + EX[id].sets, 0); }
+function doneSets() { if (!S.current) return 0; return Object.values(S.current.sets).reduce((n, a) => n + a.filter(s => s.d).length, 0); }
+function fmtDate(iso) { return new Date(iso).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }); }
+
+// History helpers
+function history(id) { const out = []; for (let i = S.log.length - 1; i >= 0; i--) { const d = (S.log[i].ex || []).find(x => x.id === id); if (d && d.vals.length) out.push(d); } return out; }
+function lastFor(id) { const name = EX[id].levels[lvl(id)]; return history(id).find(h => h.name === name) || null; }
+function readyToLevel(id) {
+  const name = EX[id].levels[lvl(id)]; const h = history(id).filter(x => x.name === name).slice(0, 2);
+  return lvl(id) < EX[id].levels.length - 1 && h.length === 2 && h.every(x => x.vals.length >= EX[id].sets && x.vals.every(v => v >= topT(id)));
+}
+
+function render() {
+  $("phasePill").textContent = PHASES[S.phase].short;
+  document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-current", String(b.dataset.view === view || (view === "workout" && b.dataset.view === "today"))));
+  const v = $("view");
+  if (view === "workout" && S.current) v.innerHTML = workoutHTML();
+  else if (view === "program") v.innerHTML = programHTML();
+  else if (view === "log") v.innerHTML = logHTML();
+  else if (view === "rules") v.innerHTML = rulesHTML();
+  else { view = "today"; v.innerHTML = todayHTML(); }
+}
+
+function todayHTML() {
+  const d = dayOf(); const mins = 8 + d.ex.length * 5 + 4;
+  const resume = !!S.current;
+  return `
+  <section class="card hero">
+    <p class="eyebrow">${resume ? "Workout in progress" : "Up next"}</p>
+    <h2>Day ${d.key}: ${d.name}</h2>
+    <p class="muted">${d.ex.length} exercises · about ${mins} min · warmup and cooldown included</p>
+    <button type="button" class="btn primary" data-act="${resume ? "resume" : "start"}">${resume ? "Resume workout" : "Start workout"}</button>
+  </section>
+  <div class="stats">
+    <div class="stat"><b>${weekCount()}/3</b><small>This week</small></div>
+    <div class="stat"><b>${S.log.length}</b><small>Total workouts</small></div>
+    <div class="stat"><b>${S.phase}</b><small>Phase</small></div>
+  </div>
+  <section class="card">
+    <h3>How it works</h3>
+    <ul class="plain">
+      <li>3 workouts a week, A then B then C. Take at least one rest day between workouts.</li>
+      <li>Watch the moving picture on each exercise before you start. Tap <b>Watch a video</b> if you need more help.</li>
+      <li>Use <b>−</b> and <b>+</b> to set how many reps (or seconds) you actually did, then tap <b>✓</b>. The rest timer starts on its own.</li>
+      <li>When an exercise says <b>Ready for Harder</b>, tap Harder.</li>
+      <li>If your form breaks down, the set is over.</li>
+    </ul>
+  </section>`;
+}
+
+function demoHTML(id) {
+  const vs = DEMO[id]; if (!vs) return "";
+  const vi = Array.isArray(vs) ? Math.min(lvl(id), vs.length - 1) : 0;
+  const v = Array.isArray(vs) ? vs[vi] : vs;
+  const cap = [v.view, v.hold ? "Get into position, then hold still" : ""].filter(Boolean).join(" · ");
+  return `<div class="demo-wrap">
+    <svg class="demo" viewBox="0 -12 200 150" role="img" aria-label="Animated demo of ${EX[id].levels[lvl(id)]}" data-demo="${id}" data-vi="${vi}"></svg>
+    ${cap ? `<div class="demo-cap"><span>${cap}</span></div>` : ""}
+  </div>`;
+}
+
+function exCard(id) {
+  const e = EX[id]; const L = lvl(id); const rows = S.current.sets[id];
+  const all = rows.every(s => s.d); const unit = unitOf(id);
+  const last = lastFor(id);
+  const q = encodeURIComponent(e.levels[L] + " exercise proper form");
+  const setRows = rows.map((s, i) => `
+    <div class="setrow ${s.d ? "is-done" : ""}">
+      <span class="lbl">Set ${i + 1}</span>
+      <button type="button" class="step" data-act="dec" data-id="${id}" data-i="${i}" aria-label="Fewer">−</button>
+      <input class="val" type="number" inputmode="numeric" min="0" max="300" id="v-${id}-${i}" data-id="${id}" data-i="${i}" value="${s.v}" aria-label="Set ${i + 1} ${unit}">
+      <button type="button" class="step" data-act="inc" data-id="${id}" data-i="${i}" aria-label="More">+</button>
+      <span class="unit">${unit}${/each/.test(e.reps) ? " each" : ""}</span>
+      <button type="button" class="set" aria-pressed="${s.d}" aria-label="Mark set ${i + 1} done" data-act="set" data-id="${id}" data-i="${i}">✓</button>
+    </div>`).join("");
+  return `
+  <article class="card">
+    <div class="ex-head">
+      <div><h3>${e.levels[L]}</h3><p class="lvl">Level ${L + 1} of ${e.levels.length} · rest ${e.rest}s</p></div>
+      ${all ? '<span class="badge done">Done</span>' : `<span class="rx">${e.sets} × ${e.reps}</span>`}
+    </div>
+    ${demoHTML(id)}
+    <p class="cue">${e.cue}</p>
+    <div class="sets">${setRows}</div>
+    <div class="last">${last ? `Last time: <b>${last.vals.join(", ")}</b> ${unit}` : "First time at this level"}${readyToLevel(id) ? ' <span class="badge done">Ready for Harder</span>' : ""}</div>
+    <div class="row">
+      <button type="button" class="btn small ghost" data-act="lvl" data-id="${id}" data-d="-1" ${L === 0 ? "disabled" : ""}>Easier</button>
+      <button type="button" class="btn small ghost" data-act="lvl" data-id="${id}" data-d="1" ${L === e.levels.length - 1 ? "disabled" : ""}>Harder</button>
+      <a class="vid" href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener">Watch a video ↗</a>
+    </div>
+  </article>`;
+}
+
+function workoutHTML() {
+  const c = S.current; const d = PHASES[c.phase].days[c.day];
+  const tot = totalSets(d); const dn = doneSets(); const pct = Math.round(dn / tot * 100);
+  return `
+  <section class="card">
+    <p class="eyebrow">${PHASES[c.phase].name}</p>
+    <h2>Day ${d.key}: ${d.name}</h2>
+    <div class="progress" aria-label="${dn} of ${tot} sets done"><i style="width:${pct}%"></i></div>
+    <p class="muted">${dn} of ${tot} sets done</p>
+  </section>
+  <section class="card">
+    <div class="ex-head"><h3>Warmup</h3><span class="rx">8 min</span></div>
+    <ul class="plain">${WARMUP.map(w => `<li>${w}</li>`).join("")}</ul>
+    <label class="check"><input type="checkbox" id="warmDone" ${c.warm ? "checked" : ""}> Warmup done</label>
+  </section>
+  ${d.ex.map(exCard).join("")}
+  <section class="card">
+    <div class="ex-head"><h3>Cooldown</h3><span class="rx">5 min</span></div>
+    <ul class="plain">${COOLDOWN.map(w => `<li>${w}</li>`).join("")}</ul>
+  </section>
+  <button type="button" class="btn primary" data-act="finish" ${dn === 0 ? "disabled" : ""}>Finish and save workout</button>
+  <button type="button" class="btn ghost" data-act="quit">${confirmKey === "quit" ? "Tap again to quit without saving" : "Quit workout"}</button>`;
+}
+
+function programHTML() {
+  const block = (p) => PHASES[p].days.map(d => `
+    <div><p class="eyebrow">Day ${d.key}</p><h3>${d.name}</h3>
+    <p class="muted">${d.ex.map(id => EX[id].levels[lvl(id)]).join(" · ")}</p></div>`).join("");
+  const p2open = S.unlocked >= 2;
+  return `
+  <section class="card">
+    <div class="ex-head"><div><p class="eyebrow">Phase 1</p><h2>${PHASES[1].name}</h2></div>${S.phase === 1 ? '<span class="badge done">Current</span>' : ""}</div>
+    <p class="muted">Bodyweight only. Build form, control, and a base of strength. Plan on at least 6 to 8 weeks here.</p>
+    <div class="daylist">${block(1)}</div>
+    ${S.phase !== 1 ? '<button type="button" class="btn" data-act="phase" data-p="1">Switch to Phase 1</button>' : ""}
+  </section>
+  <section class="card">
+    <div class="ex-head"><div><p class="eyebrow">Phase 2</p><h2>${PHASES[2].name}</h2></div>${S.phase === 2 ? '<span class="badge done">Current</span>' : p2open ? "" : '<span class="badge lock">Locked</span>'}</div>
+    <p class="muted">Kettlebells added. Start with the lightest bell you have and go up only when every rep looks clean.</p>
+    <div class="daylist">${block(2)}</div>
+    ${p2open
+      ? (S.phase !== 2 ? '<button type="button" class="btn primary" data-act="phase" data-p="2">Switch to Phase 2</button>' : "")
+      : `<p class="warn">A parent unlocks this phase after checking form on squats, lunges, and push-ups.</p>
+         <form class="row" id="unlockForm"><input type="password" id="unlockCode" inputmode="numeric" placeholder="Parent code" aria-label="Parent code"><button type="submit" class="btn">Unlock</button></form>
+         <p class="muted" id="unlockMsg" hidden>That code didn't match. Ask a parent.</p>`}
+  </section>
+  <section class="card">
+    <div class="ex-head"><div><p class="eyebrow">Phase 3</p><h2>Barbell Basics</h2></div><span class="badge lock">Parent present</span></div>
+    <p class="muted">Barbell squat, Romanian deadlift, and bench press with an empty or very light bar. These only happen with a parent in the room and a spotter on bench press. Not built yet. A parent adds this when you're ready.</p>
+  </section>`;
+}
+
+function logHTML() {
+  if (!S.log.length) return `<section class="card"><h3>No workouts yet</h3><p class="muted">Finish your first workout and it shows up here with every set you did.</p></section>`;
+  const rows = S.log.slice().reverse().map(l => `
+    <div class="log-item">
+      <div class="log-top"><div><b>Day ${l.key}: ${l.name}</b><p class="muted">${fmtDate(l.date)} · Phase ${l.phase}</p></div><span class="rx">${l.sets}/${l.total} sets</span></div>
+      ${l.ex ? `<div class="log-ex">${l.ex.filter(x => x.vals.length).map(x => `<span>${x.name}</span><span>${x.vals.join(", ")} ${x.unit}</span>`).join("")}</div>` : ""}
+    </div>`).join("");
+  return `
+  <section class="card"><div class="ex-head"><h2>Workout log</h2><span class="muted">${S.log.length} total</span></div><div>${rows}</div></section>
+  <button type="button" class="btn ghost" data-act="clearlog">${confirmKey === "clearlog" ? "Tap again to erase the whole log" : "Clear log"}</button>`;
+}
+
+function rulesHTML() {
+  return `
+  <section class="card">
+    <h2>Training rules</h2>
+    <ul class="plain">
+      <li><b>Form first.</b> If form breaks, the set is over. Never add weight to bad reps.</li>
+      <li><b>Log what you really did.</b> Fewer reps with good form beats more reps with bad form.</li>
+      <li><b>Rest days matter.</b> Don't train two days in a row. Muscles grow on rest days.</li>
+      <li><b>Pain means stop.</b> Sore muscles the next day are normal. Sharp pain or joint pain is not. Stop and tell a parent.</li>
+      <li><b>No max lifts.</b> We never test how much you can lift one time.</li>
+      <li><b>Throwing days count.</b> On heavy throwing or pitching days, skip Day B or just do the Y-T-W raises.</li>
+      <li><b>Barbell and bench press</b> only with a parent in the room.</li>
+      <li><b>Fuel up.</b> Drink water, and eat a real meal or snack after training.</li>
+    </ul>
+  </section>
+  <section class="card">
+    <h3>Put this on your phone</h3>
+    <ul class="plain">
+      <li>iPhone: open this page in Safari, tap Share, then Add to Home Screen.</li>
+      <li>Android: open in Chrome, tap the menu, then Add to Home screen.</li>
+      <li>Your progress saves on the phone you use. Stick with one phone.</li>
+    </ul>
+  </section>`;
+}
+
+/* ---------- Demo animation ---------- */
+const NS = "http://www.w3.org/2000/svg";
+const reduceMotion = (() => { try { return matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) { return false; } })();
+function mk(svg, tag, cls, attrs) { const el = document.createElementNS(NS, tag); if (cls) el.setAttribute("class", cls); for (const k in (attrs || {})) el.setAttribute(k, attrs[k]); svg.appendChild(el); return el; }
+function variantOf(svg) { const vs = DEMO[svg.dataset.demo]; return Array.isArray(vs) ? vs[+svg.dataset.vi] : vs; }
+function build(svg) {
+  const v = variantOf(svg); const f = {};
+  if (!v.view || !/above/.test(v.view)) mk(svg, "line", "floor", { x1: 8, y1: 132, x2: 192, y2: 132 });
+  if (v.bench) { const [x, y, w] = v.bench; mk(svg, "rect", "prop", { x, y, width: w, height: 6, rx: 2 }); mk(svg, "rect", "prop", { x: x + 4, y: y + 6, width: 4, height: 132 - y - 6 }); mk(svg, "rect", "prop", { x: x + w - 8, y: y + 6, width: 4, height: 132 - y - 6 }); }
+  const L = (c) => mk(svg, "line", c);
+  f.fa1 = L("far"); f.fa2 = L("far"); f.fl1 = L("far"); f.fl2 = L("far"); if (v.foot !== false) f.ff = L("far");
+  f.torso = L("near"); f.nl1 = L("near"); f.nl2 = L("near"); if (v.foot !== false) f.nf = L("near");
+  f.head = mk(svg, "circle", "head", { r: 8 });
+  f.na1 = L("near"); f.na2 = L("near");
+  if (v.p[0].length > 22) f.kb = mk(svg, "circle", "kb", { r: 6.5 });
+  svg._f = f; svg._v = v;
+}
+function seg(el, a, b) { if (!el) return; el.setAttribute("x1", a[0]); el.setAttribute("y1", a[1]); el.setAttribute("x2", b[0]); el.setAttribute("y2", b[1]); }
+function pose(svg, P) {
+  const f = svg._f; const pt = (i) => [P[i * 2], P[i * 2 + 1]];
+  const H = pt(0), N = pt(1), E = pt(2), W = pt(3), E2 = pt(4), W2 = pt(5), Hp = pt(6), K = pt(7), A = pt(8), K2 = pt(9), A2 = pt(10);
+  seg(f.fa1, N, E2); seg(f.fa2, E2, W2); seg(f.fl1, Hp, K2); seg(f.fl2, K2, A2); seg(f.ff, A2, [A2[0] + 8, A2[1]]);
+  seg(f.torso, N, Hp); seg(f.nl1, Hp, K); seg(f.nl2, K, A); seg(f.nf, A, [A[0] + 8, A[1]]);
+  f.head.setAttribute("cx", H[0]); f.head.setAttribute("cy", H[1]);
+  seg(f.na1, N, E); seg(f.na2, E, W);
+  if (f.kb) { f.kb.setAttribute("cx", P[22]); f.kb.setAttribute("cy", P[23]); }
+}
+function frame(now) {
+  document.querySelectorAll("svg.demo").forEach(svg => {
+    if (!svg._f) build(svg);
+    const v = svg._v, ps = v.p;
+    if (ps.length === 1 || reduceMotion) { pose(svg, ps[ps.length - 1]); return; }
+    const D = v.speed || 1100; const n = ps.length;
+    const u = (now / D) % n; const i = Math.floor(u); let t = u - i;
+    t = Math.min(1, Math.max(0, (t - 0.25) / 0.6)); t = t * t * (3 - 2 * t);
+    const a = ps[i], b = ps[(i + 1) % n]; const len = Math.min(a.length, b.length);
+    const P = new Array(len); for (let k = 0; k < len; k++) P[k] = a[k] + (b[k] - a[k]) * t;
+    pose(svg, P);
+  });
+  requestAnimationFrame(frame);
+}
+
+/* ---------- Rest timer ---------- */
+let tEnd = 0, tInt = null, ac = null;
+function ensureAudio() { try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === "suspended") ac.resume(); } catch (e) {} }
+function beep() {
+  try { if (!ac) return; [0, 0.35].forEach(off => { const o = ac.createOscillator(), g = ac.createGain(); o.frequency.value = 880; g.gain.value = 0.15; o.connect(g); g.connect(ac.destination); o.start(ac.currentTime + off); o.stop(ac.currentTime + off + 0.2); }); } catch (e) {}
+  try { navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch (e) {}
+}
+function tick() {
+  const left = Math.max(0, Math.ceil((tEnd - Date.now()) / 1000));
+  $("timerCount").textContent = left > 0 ? `${Math.floor(left / 60)}:${String(left % 60).padStart(2, "0")}` : "Go!";
+  if (left <= 0) { clearInterval(tInt); tInt = null; beep(); setTimeout(() => { if (!tInt) $("timer").hidden = true; }, 2500); }
+}
+function startTimer(sec) { tEnd = Date.now() + sec * 1000; $("timer").hidden = false; clearInterval(tInt); tInt = setInterval(tick, 250); tick(); }
+function stopTimer() { clearInterval(tInt); tInt = null; $("timer").hidden = true; }
+
+let wake = null;
+function keepAwake() { try { navigator.wakeLock && navigator.wakeLock.request("screen").then(w => wake = w).catch(() => {}); } catch (e) {} }
+
+let toastT = null;
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 2600); }
+
+function newWorkout() {
+  const day = (S.next[S.phase] || 0) % 3; const d = PHASES[S.phase].days[day]; const sets = {};
+  d.ex.forEach(id => { const last = lastFor(id); sets[id] = Array.from({ length: EX[id].sets }, (_, i) => ({ v: last && last.vals[i] != null ? last.vals[i] : lowT(id), d: false })); });
+  return { phase: S.phase, day, sets, warm: false };
+}
+
+document.addEventListener("click", (ev) => {
+  const tab = ev.target.closest(".tabs button");
+  if (tab) { confirmKey = null; view = tab.dataset.view === "today" && S.current ? "workout" : tab.dataset.view; render(); window.scrollTo(0, 0); return; }
+  const b = ev.target.closest("[data-act]"); if (!b) return;
+  const act = b.dataset.act;
+  if (act !== "quit" && act !== "clearlog") confirmKey = null;
+  if (act === "start") { ensureAudio(); S.current = newWorkout(); save(); view = "workout"; keepAwake(); render(); window.scrollTo(0, 0); }
+  else if (act === "resume") { view = "workout"; keepAwake(); render(); }
+  else if (act === "inc" || act === "dec") {
+    const id = b.dataset.id, s = S.current.sets[id][+b.dataset.i]; const step = unitOf(id) === "sec" ? 5 : 1;
+    s.v = Math.max(0, Math.min(300, (+s.v || 0) + (act === "inc" ? step : -step))); save();
+    const inp = $(`v-${id}-${b.dataset.i}`); if (inp) inp.value = s.v;
+  } else if (act === "set") {
+    ensureAudio();
+    const id = b.dataset.id, i = +b.dataset.i; const s = S.current.sets[id][i];
+    const inp = $(`v-${id}-${i}`); if (inp) s.v = Math.max(0, Math.min(300, parseInt(inp.value, 10) || 0));
+    s.d = !s.d; save();
+    const d = PHASES[S.current.phase].days[S.current.day];
+    if (s.d && doneSets() < totalSets(d)) startTimer(EX[id].rest);
+    if (doneSets() === totalSets(d)) { stopTimer(); toast("All sets done. Cool down and tap Finish."); }
+    render();
+  } else if (act === "lvl") {
+    const id = b.dataset.id; S.levels[id] = Math.max(0, Math.min(EX[id].levels.length - 1, lvl(id) + +b.dataset.d));
+    if (S.current && S.current.sets[id] && !S.current.sets[id].some(s => s.d)) S.current.sets[id].forEach(s => s.v = lowT(id));
+    save(); render();
+  } else if (act === "finish") {
+    const c = S.current; const d = PHASES[c.phase].days[c.day];
+    const ex = d.ex.map(id => ({ id, name: EX[id].levels[lvl(id)], unit: unitOf(id), vals: c.sets[id].filter(s => s.d).map(s => s.v) }));
+    S.log.push({ date: new Date().toISOString(), phase: c.phase, key: d.key, name: d.name, sets: doneSets(), total: totalSets(d), ex });
+    S.next[c.phase] = (c.day + 1) % 3; S.current = null; save(); stopTimer();
+    try { wake && wake.release(); } catch (e) {}
+    view = "today"; render(); window.scrollTo(0, 0); toast("Workout saved. Nice work.");
+  } else if (act === "quit") {
+    if (confirmKey === "quit") { S.current = null; save(); stopTimer(); confirmKey = null; view = "today"; render(); window.scrollTo(0, 0); }
+    else { confirmKey = "quit"; render(); }
+  } else if (act === "clearlog") {
+    if (confirmKey === "clearlog") { S.log = []; save(); confirmKey = null; render(); }
+    else { confirmKey = "clearlog"; render(); }
+  } else if (act === "phase") {
+    if (S.current) { toast("Finish or quit your current workout first."); return; }
+    S.phase = +b.dataset.p; save(); render(); toast(`Switched to ${PHASES[S.phase].name}.`);
+  } else if (act === "timer-add") { tEnd += 15000; if (!tInt) { tInt = setInterval(tick, 250); $("timer").hidden = false; } tick(); }
+  else if (act === "timer-skip") { stopTimer(); }
+});
+document.addEventListener("change", (ev) => {
+  const t = ev.target;
+  if (t.id === "warmDone" && S.current) { S.current.warm = t.checked; save(); }
+  if (t.classList.contains("val") && S.current) { const s = S.current.sets[t.dataset.id][+t.dataset.i]; s.v = Math.max(0, Math.min(300, parseInt(t.value, 10) || 0)); t.value = s.v; save(); }
+});
+document.addEventListener("submit", (ev) => {
+  if (ev.target.id !== "unlockForm") return;
+  ev.preventDefault();
+  if ($("unlockCode").value.trim() === PARENT_CODE) { S.unlocked = 2; save(); render(); toast("Phase 2 unlocked."); }
+  else { $("unlockMsg").hidden = false; }
+});
+render();
+requestAnimationFrame(frame);
+</script>
+
+</body>
+</html>
